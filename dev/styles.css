@@ -1,0 +1,19 @@
+body {
+  font-family: sans-serif;
+  font-weight: 200;
+  margin: auto;
+  display: flex;
+
+}
+
+chartsy {
+  max-width: 720px;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.littlie #chartCanvas {
+  margin-left: 1 0 0 0;
+}
