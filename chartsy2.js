@@ -15,15 +15,18 @@ class ChartsyChart extends LitElement {
       display: block;
     }
     canvas {
-      // Add your styles here
+      max-width: 600px;
+      max-height: 400px;
     }
   `;
 
   constructor() {
     super();
-    this.chartData = null; // Default to null, expect object later
-    this.chartOptions = {}; // Default to empty object, can be customized
-    this.chartType = 'line'; // Default chart type
+    // Initialize with default chart type, sample data, and default options
+    this.chartType = 'bar';
+    this.chartData = this.getDefaultChartData();
+    this.chartOptions = this.getDefaultChartOptions();
+    this.chart = null;
   }
 
   updated(changedProperties) {
@@ -33,34 +36,73 @@ class ChartsyChart extends LitElement {
   }
 
   renderChart() {
+    if (!this.chartData) return;
+
     const canvas = this.shadowRoot.getElementById('chartCanvas');
-    if (canvas && this.chartData) {
-      const ctx = canvas.getContext('2d');
-      if (this.chart) {
-        this.chart.destroy(); // Clean up the old chart instance before creating a new one
-      }
-
-      const mergedOptions = {
-        ...{
-          // Your default options here, if any
-        },
-        ...this.chartOptions
-      };
-
-      this.chart = new Chart(ctx, {
-        type: this.chartType,
-        data: this.chartData,
-        options: mergedOptions,
-      });
+    const ctx = canvas.getContext('2d');
+    if (this.chart) {
+      this.chart.destroy();
     }
+
+    this.chart = new Chart(ctx, {
+      type: this.chartType,
+      data: this.chartData,
+      options: this.chartOptions,
+    });
+  }
+
+  getDefaultChartOptions() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Sample Chart'
+        }
+      }
+    };
+  }
+
+  getDefaultChartData() {
+    return {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }]
+    };
   }
 
   render() {
-    return html`
-      <canvas id="chartCanvas"></canvas>
-    `;
+    return html`<canvas id="chartCanvas"></canvas>`;
   }
-}
 
-window.ChartsyChart = ChartsyChart;
-customElements.define('chartsy-chart', ChartsyChart);
+  // Method for updating the chart with new settings
+  updateChart({ chartType, chartData, chartOptions }) {
+    this.chartType = chartType || this.chartType;
+    this.chartData = chartData || this.chartData;
+    this.chartOptions = chartOptions || this.chartOptions;
+    this.renderChart();
+  }
+} customElements.define('chartsy-chart', ChartsyChart);
