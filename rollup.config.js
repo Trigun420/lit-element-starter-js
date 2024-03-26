@@ -10,7 +10,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 
 export default {
-  input: 'chartsy.js',
+  input: 'chartsy2.js',
   output: {
     file: 'chartsy.bundled.js',
     format: 'esm',

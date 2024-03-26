@@ -16,7 +16,7 @@
     "docs:clean": "rimraf docs",
     "docs:gen": "eleventy --config=.eleventy.cjs",
     "docs:gen:watch": "eleventy --config=.eleventy.cjs --watch",
-    "docs:build": "rollup -c --file docs/chartsy.js",
+    "docs:build": "rollup -c --file docs/chartsy2.js",
     "docs:assets": "cp node_modules/prismjs/themes/prism-okaidia.css docs/",
     "docs:serve": "wds --root-dir=docs --node-resolve --watch",
     "analyze": "cem analyze --litelement --globs \"**/*.js\" --exclude docs",
@@ -28,7 +28,7 @@
     "test:watch": "wtr --watch",
     "test:prod": "MODE=prod wtr",
     "test:prod:watch": "MODE=prod wtr --watch",
-    "checksize": "rollup -c ; cat chartsy.js | gzip -9 | wc -c ; rm chartsy.js"
+    "checksize": "rollup -c ; cat chartsy2.js | gzip -9 | wc -c ; rm chartsy2.js"
   },
   "keywords": [
     "web-components",
