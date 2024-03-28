@@ -11,14 +11,20 @@ class ChartsyChart extends LitElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log(`[ChartsyChart] Attribute changed: ${name}, from: ${oldValue}, to: ${newValue}`);
     super.attributeChangedCallback(name, oldValue, newValue);
-    if (name === 'chart-type') {
+    if (name === 'chart-type' && oldValue !== newValue) {
       this.chartType = newValue;
-      console.log(`[ChartsyChart] chartType property set to ${newValue} via attributeChangedCallback, invoking renderChart.`);
+
+      // Reset chart options to default
+      // Either set it to {} for true Chart.js defaults
+      // or use your method to get a predefined default state
+      this.chartOptions = this.getDefaultChartOptions();
+
       this.renderChart();
     }
   }
+
+
 
   static styles = css`
     :host {
@@ -40,38 +46,41 @@ class ChartsyChart extends LitElement {
 
   renderChart() {
     console.log('[ChartsyChart] renderChart called');
-    // Guard against null shadowRoot. This is just extra precautionary;
-    // connectedCallback ensures that shadowRoot is available.
+
     if (!this.shadowRoot) {
       console.warn("[ChartsyChart] shadowRoot is not available.");
       return;
-
     }
-    console.log('[ChartsyChart] renderChart called');
+
+    // Destroy the existing chart instance if it exists
+    if (this.chart) {
+      console.log('[ChartsyChart] Destroying old chart instance.');
+      this.chart.destroy();
+      this.chart = null; // Clear the reference to facilitate garbage collection
+    }
+
+    // Remove existing canvas to ensure a fresh start
     const existingCanvas = this.shadowRoot.querySelector('canvas');
-    console.log(`[ChartsyChart] Existing canvas: ${existingCanvas ? 'found' : 'not found'}, proceeding to remove and replace.`);
     if (existingCanvas) {
       existingCanvas.remove();
     }
 
+    // Create a new canvas element
     const newCanvas = document.createElement('canvas');
     newCanvas.setAttribute('id', 'chartCanvas');
     this.shadowRoot.appendChild(newCanvas);
 
     const ctx = newCanvas.getContext('2d');
-    if (this.chart) {
-      console.log('[ChartsyChart] Destroying old chart instance before creating a new one.');
-      this.chart.destroy();
-    }
 
     console.log(`[ChartsyChart] Creating new chart instance with type: ${this.chartType}, data: ${JSON.stringify(this.chartData)}, options: ${JSON.stringify(this.chartOptions)}`);
+    // Create the new chart instance
     this.chart = new Chart(ctx, {
       type: this.chartType,
       data: this.chartData,
       options: this.chartOptions,
     });
-
   }
+
 
   getDefaultChartOptions() {
     console.log('[ChartsyChart] getDefaultChartOptions called');
@@ -134,31 +143,15 @@ class ChartsyChart extends LitElement {
     console.log('[ChartsyChart] updateChart called with data:', JSON.stringify(chartData));
     console.log('[ChartsyChart] updateChart called with options:', JSON.stringify(chartOptions));
 
-    let shouldRenderChart = false;
+    // Update the component properties
+    if (chartType) this.chartType = chartType;
+    if (chartData) this.chartData = chartData;
+    if (chartOptions) this.chartOptions = chartOptions;
 
-    if (chartType && this.chartType !== chartType) {
-      console.log(`[ChartsyChart] chartType changed to ${chartType}`);
-      this.chartType = chartType;
-      shouldRenderChart = true;
-    }
-    if (chartData && JSON.stringify(this.chartData) !== JSON.stringify(chartData)) {
-      console.log('[ChartsyChart] chartData changed');
-      this.chartData = { ...chartData };
-      shouldRenderChart = true;
-    }
-    if (chartOptions || shouldRenderChart) {
-      console.log('[ChartsyChart] Updating/resetting chart options');
-      this.chartOptions = chartOptions;
-      shouldRenderChart = true;
-    }
-
-    if (shouldRenderChart) {
-      console.log('[ChartsyChart] Conditions met for re-rendering chart. Invoking renderChart.');
-      this.renderChart();
-    } else {
-      console.log('[ChartsyChart] No significant changes detected. No need to re-render chart.');
-    }
+    // Re-render the chart with updated properties
+    this.renderChart();
   }
+
 }
 
 customElements.define('chartsy-chart', ChartsyChart);
