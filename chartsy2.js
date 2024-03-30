@@ -14,17 +14,10 @@ class ChartsyChart extends LitElement {
     super.attributeChangedCallback(name, oldValue, newValue);
     if (name === 'chart-type' && oldValue !== newValue) {
       this.chartType = newValue;
-
-      // Reset chart options to default
-      // Either set it to {} for true Chart.js defaults
-      // or use your method to get a predefined default state
       this.chartOptions = this.getDefaultChartOptions();
-
       this.renderChart();
     }
   }
-
-
 
   static styles = css`
     :host {
@@ -38,42 +31,38 @@ class ChartsyChart extends LitElement {
 
   constructor() {
     super();
-    console.log('[ChartsyChart] constructor');
     this.chart = null; // Initialize the chart variable here
+    console.log('[ChartsyChart] constructor');
   }
 
-
+  // lets over-ride using shadowroot. (it just looks prettier in the code, and honestly its a bit simpler in the whole 
+  // lifecycle if the shadow-dom doesn't render quite fast enough)
+  createRenderRoot() {
+    return this;
+  }
 
   renderChart() {
     console.log('[ChartsyChart] renderChart called');
-
-    if (!this.shadowRoot) {
-      console.warn("[ChartsyChart] shadowRoot is not available.");
-      return;
-    }
 
     // Destroy the existing chart instance if it exists
     if (this.chart) {
       console.log('[ChartsyChart] Destroying old chart instance.');
       this.chart.destroy();
-      this.chart = null; // Clear the reference to facilitate garbage collection
     }
 
-    // Remove existing canvas to ensure a fresh start
-    const existingCanvas = this.shadowRoot.querySelector('canvas');
+    // Use this.querySelector now that we're directly in the light DOM
+    const existingCanvas = this.querySelector('canvas');
     if (existingCanvas) {
       existingCanvas.remove();
     }
 
-    // Create a new canvas element
     const newCanvas = document.createElement('canvas');
     newCanvas.setAttribute('id', 'chartCanvas');
-    this.shadowRoot.appendChild(newCanvas);
+    this.appendChild(newCanvas); // Append to this, as we're in the light DOM
 
     const ctx = newCanvas.getContext('2d');
 
     console.log(`[ChartsyChart] Creating new chart instance with type: ${this.chartType}, data: ${JSON.stringify(this.chartData)}, options: ${JSON.stringify(this.chartOptions)}`);
-    // Create the new chart instance
     this.chart = new Chart(ctx, {
       type: this.chartType,
       data: this.chartData,
@@ -81,10 +70,8 @@ class ChartsyChart extends LitElement {
     });
   }
 
-
   getDefaultChartOptions() {
     console.log('[ChartsyChart] getDefaultChartOptions called');
-    // Default chart options
     const options = {
       responsive: true,
       maintainAspectRatio: false,
@@ -104,7 +91,6 @@ class ChartsyChart extends LitElement {
 
   getDefaultChartData() {
     console.log('[ChartsyChart] getDefaultChartData called');
-    // Default chart data
     const data = {
       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
       datasets: [{
@@ -115,7 +101,7 @@ class ChartsyChart extends LitElement {
           'rgba(54, 162, 235, 0.2)',
           'rgba(255, 206, 86, 0.2)',
           'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
           'rgba(255, 159, 64, 0.2)'
         ],
         borderColor: [
@@ -129,13 +115,8 @@ class ChartsyChart extends LitElement {
         borderWidth: 1,
       }],
     };
-    console.log(`[ChartsyChart] Default chart data: ${JSON.stringify(data)}`);
+    console.log(`[ChartsyChart] Default chart data for updateChartData function: ${JSON.stringify(data)}`);
     return data;
-  }
-
-  render() {
-    console.log('[ChartsyChart] render method called');
-    return html`<canvas id="chartCanvas"></canvas>`;
   }
 
   updateChart({ chartType, chartData, chartOptions }) {
@@ -143,16 +124,12 @@ class ChartsyChart extends LitElement {
     console.log('[ChartsyChart] updateChart called with data:', JSON.stringify(chartData));
     console.log('[ChartsyChart] updateChart called with options:', JSON.stringify(chartOptions));
 
-    // Update the component properties
     if (chartType) this.chartType = chartType;
     if (chartData) this.chartData = chartData;
     if (chartOptions) this.chartOptions = chartOptions;
 
-    // Re-render the chart with updated properties
     this.renderChart();
   }
-
 }
 
 customElements.define('chartsy-chart', ChartsyChart);
-
