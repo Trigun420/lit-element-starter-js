@@ -1,3 +1,4 @@
+// prettier-ignore
 function updateChartData() {
   const chartElement = document.getElementById('%%ID%%');
 
@@ -12,19 +13,18 @@ function updateChartData() {
   // Prepare data based on the chartType
   switch (chartType) {
     case 'line':
-
-      // Default to using an array of numbers for bar charts, and potentially others
+    case 'radar':
+      
       newData = {
-        labels: {{ content.settings.chart_data | json_encode | raw }
-  }.map(item => item.label),
+        labels: {{ content.settings.chart_data | json_encode | raw }}.map(item => item.label),
     datasets: [{
       label: {{ content.settings.chart_label | json_encode | raw }},
-data: { { content.settings.chart_data | json_encode | raw } }.map(item => item.value),
-  backgroundColor: { { content.settings.chart_data | json_encode | raw } }.map(item => item.fill_color),
-    borderColor: { { content.settings.chart_data | json_encode | raw } }.map(item => item.border_color),
-      borderWidth: { { content.settings.line_border_width | json_encode | raw } },
-borderRadius: { { content.settings.border_radius | json_encode | raw } },
-tension: .3
+      data: {{ content.settings.chart_data | json_encode | raw }}.map(item => item.value),
+      backgroundColor: {{ content.settings.chart_data | json_encode | raw }}.map(item => item.fill_color),
+       borderColor: {{ content.settings.chart_data | json_encode | raw }}.map(item => item.border_color),
+      borderWidth: {{ content.settings.line_border_width | json_encode | raw }},
+borderRadius: {{ content.settings.border_radius | json_encode | raw }},
+tension: {{ content.settings.line_tension | json_encode | raw }},
         }],
       };
 break;
@@ -54,13 +54,12 @@ const options = {
   responsive: true,
   maintainAspectRatio: false,
   aspectRatio: {{ design.styles.aspect_ratio }},
-    // Add other global chart options here
+  //we can add more options here as we realise more cool stuff to do
   };
 
-// Update the chart with the newly prepared data and options
+
 chartElement.updateChart({ chartData: newData, chartOptions: options });
 }
 
-// Assuming newData is dynamically prepared based on the content and chart type,
-// simply call updateChartData to apply the changes.
+
 updateChartData();

@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, css } from 'lit';
 import Chart from 'chart.js/auto';
 
 class ChartsyChart extends LitElement {
